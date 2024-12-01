@@ -1,0 +1,27 @@
+{
+  "name": "typescript-advent-of-code-2025",
+  "version": "1.0.0",
+  "description": "Advent of Code 2025 solutions",
+  "main": "index.ts",
+  "scripts": {
+    "day1": "tsx src/day1/day1.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mcullifer/Typescript-Advent-of-Code-2024.git"
+  },
+  "author": "mcullifer",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mcullifer/Typescript-Advent-of-Code-2024/issues"
+  },
+  "homepage": "https://github.com/mcullifer/Typescript-Advent-of-Code-2024#readme",
+  "dependencies": {
+    "prettier": "^3.4.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.9"
+  }
+}
