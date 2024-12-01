@@ -4,7 +4,7 @@ import { Reader } from '@/util/reader';
 const test = Reader.read(1, 'test');
 const input = Reader.read(1, 'input');
 
-function setup(input: string[]) {
+function setup(input: string[]): [number[], number[]] {
 	let left = Array(input.length).fill(0);
 	let right = Array(input.length).fill(0);
 	let count = 0;
@@ -19,7 +19,7 @@ function setup(input: string[]) {
 }
 
 function part1(input: string[]): number {
-	let [left, right] = setup(input);
+	const [left, right] = setup(input);
 	left.sort((a, b) => a - b);
 	right.sort((a, b) => a - b);
 	let sum = 0;
@@ -30,14 +30,16 @@ function part1(input: string[]): number {
 }
 
 function part2(input: string[]): number {
-	let [left, right] = setup(input);
+	const [left, right] = setup(input);
 	let sum = 0;
 	let seen = new Map<number, number>();
 	let frequency: number | undefined;
 	let temp = 0;
 	for (let i = 0; i < left.length; i++) {
+		// In the case of my input there were no duplicates
+		// so skipping the second for loop didn't provide any performance gain
 		frequency = seen.get(left[i]);
-		if (frequency != undefined && frequency > 0) {
+		if (frequency !== undefined && frequency > 0) {
 			sum += left[i] * frequency;
 			continue;
 		}
