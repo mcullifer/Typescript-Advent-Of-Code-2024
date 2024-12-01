@@ -9,18 +9,19 @@ function setup(input: string[]) {
 	let right = Array(input.length).fill(0);
 	let count = 0;
 	for (let line of input) {
-		let split = line.replace('   ', ' ').split(' ');
+		let split = line.split('   ');
 		left[count] = parseInt(split[0]);
 		right[count] = parseInt(split[1]);
 		count++;
 	}
+
 	return [left, right];
 }
 
 function part1(input: string[]): number {
 	let [left, right] = setup(input);
-	left.sort((a, b) => a-b);
-	right.sort((a, b) => a-b);
+	left.sort((a, b) => a - b);
+	right.sort((a, b) => a - b);
 	let sum = 0;
 	for (let i = 0; i < left.length; i++) {
 		sum += Math.abs(left[i] - right[i]);
@@ -37,7 +38,7 @@ function part2(input: string[]): number {
 	for (let i = 0; i < left.length; i++) {
 		frequency = seen.get(left[i]);
 		if (frequency != undefined && frequency > 0) {
-			sum += (left[i] * frequency);
+			sum += left[i] * frequency;
 			continue;
 		}
 		seen.set(left[i], 0);
@@ -45,9 +46,9 @@ function part2(input: string[]): number {
 			if (right[j] === left[i]) {
 				temp++;
 				seen.set(left[i], temp);
-			}			
+			}
 		}
-		sum += (left[i] * temp);
+		sum += left[i] * temp;
 		temp = 0;
 	}
 	return sum;

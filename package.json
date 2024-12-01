@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/mcullifer/Typescript-Advent-of-Code-2024#readme",
   "dependencies": {
+    "eslint": "^9.16.0",
     "prettier": "^3.4.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
