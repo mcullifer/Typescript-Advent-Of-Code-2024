@@ -1,7 +1,7 @@
 {
-  "name": "typescript-advent-of-code-2025",
+  "name": "typescript-advent-of-code-2024",
   "version": "1.0.0",
-  "description": "Advent of Code 2025 solutions",
+  "description": "Advent of Code 2024 solutions",
   "main": "index.ts",
   "scripts": {
     "day1": "tsx src/day1/day1.ts"
