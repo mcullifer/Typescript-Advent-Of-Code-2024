@@ -1,5 +1,5 @@
 import { Benchmark } from '@/util/benchmark';
-import { Reader } from '@/util/Reader';
+import { Reader } from '@/util/reader';
 
 const test = Reader.read(1, 'test');
 const input = Reader.read(1, 'input');
