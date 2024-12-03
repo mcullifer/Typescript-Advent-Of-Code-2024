@@ -5,7 +5,8 @@
 	"main": "index.ts",
 	"scripts": {
 		"day1": "tsx src/day1/day1.ts",
-		"day2": "tsx src/day2/day2.ts"
+		"day2": "tsx src/day2/day2.ts",
+		"day3": "tsx src/day3/day3.ts"
 	},
 	"repository": {
 		"type": "git",
