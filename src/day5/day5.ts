@@ -39,11 +39,8 @@ function part1(input: string[]) {
 			let order = orderingMap.get(updates[j]);
 			if (!order) continue;
 			for (let k = 0; k < j; k++) {
-				if (order.includes(updates[k])) {
-					isValid = false;
-					break;
-				}
-				isValid = true;
+				isValid = !order.includes(updates[k]);
+				if (!isValid) break;
 			}
 			if (!isValid) break;
 		}
@@ -95,6 +92,7 @@ function part2(input: string[]) {
 	}
 	return sum;
 }
+
 Benchmark.run(part1, test);
 console.log('---------------------');
 Benchmark.run(part2, test);
