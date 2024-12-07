@@ -100,7 +100,6 @@ function part1And2(input: string[]) {
 	return DFS(input, start);
 }
 
-// Answer is 1812
 Benchmark.run(part1And2, test);
 console.log('---------------------');
 // Benchmark.run(part2, test);
