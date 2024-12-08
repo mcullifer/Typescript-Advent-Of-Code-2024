@@ -28,12 +28,12 @@ function getAntennaPositions(input: string[]) {
 	return antennaPositions;
 }
 
-function propogate(
+function propagate(
 	startNode: Point,
 	endNode: Point,
 	maxCoords: Point,
 	distance: Point,
-	propogateToEnd = false
+	propagateToEnd = false
 ) {
 	const antiNodes = [];
 	let continueStart = true;
@@ -41,7 +41,7 @@ function propogate(
 	// In Part 1 we don't include the nodes themselves so we
 	// start at the next values out, push the nodes to the antiNodes list, then
 	// exit the loop after the first iteration.
-	if (!propogateToEnd) {
+	if (!propagateToEnd) {
 		startNode[0] += distance[0];
 		startNode[1] += distance[1];
 		endNode[0] -= distance[0];
@@ -60,7 +60,7 @@ function propogate(
 			endNode[0] -= distance[0];
 			endNode[1] -= distance[1];
 		}
-		if (!propogateToEnd) {
+		if (!propagateToEnd) {
 			continueStart = false;
 			continueEnd = false;
 		}
@@ -71,7 +71,7 @@ function propogate(
 function getAntiNodes(
 	antennaPositions: Map<string, Point[]>,
 	maxCoords: Point,
-	propogateToEnd = false
+	propagateToEnd = false
 ) {
 	const antiNodes = new Set<string>();
 	const current: Point = [0, 0];
@@ -86,7 +86,7 @@ function getAntiNodes(
 				current[1] = positions[i][1];
 				distance[0] = next[0] - current[0];
 				distance[1] = next[1] - current[1];
-				for (let antiNode of propogate(next, current, maxCoords, distance, propogateToEnd)) {
+				for (let antiNode of propagate(next, current, maxCoords, distance, propagateToEnd)) {
 					antiNodes.add(antiNode);
 				}
 			}
