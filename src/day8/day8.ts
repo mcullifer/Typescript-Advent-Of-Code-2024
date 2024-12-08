@@ -1,15 +1,18 @@
 import { Benchmark } from '@/util/benchmark';
 import { Reader } from '@/util/reader';
 
-const test = Reader.read(8, 'test');
-const input = Reader.read(8, 'input');
+type Point = [number, number];
 
 function isAntenna(char: string) {
 	return char.match(/[a-zA-Z0-9]/);
 }
 
+function inBounds(node: Point, max: Point) {
+	return node[0] >= 0 && node[0] < max[0] && node[1] >= 0 && node[1] < max[1];
+}
+
 function getAntennaPositions(input: string[]) {
-	let antennaPositions = new Map<string, [number, number][]>();
+	let antennaPositions = new Map<string, Point[]>();
 	for (let i = 0; i < input.length; i++) {
 		for (let j = 0; j < input[i].length; j++) {
 			if (!isAntenna(input[i][j])) continue;
@@ -25,36 +28,39 @@ function getAntennaPositions(input: string[]) {
 	return antennaPositions;
 }
 
-function inBounds(val: number, max: number) {
-	return val >= 0 && val < max;
-}
-
 function propogate(
-	startNode: [number, number],
-	endNode: [number, number],
-	rowMax: number,
-	colMax: number,
-	dy: number,
-	dx: number,
-	once = false
+	startNode: Point,
+	endNode: Point,
+	maxCoords: Point,
+	distance: Point,
+	propogateToEnd = false
 ) {
-	let antiNodes = [];
+	const antiNodes = [];
 	let continueStart = true;
 	let continueEnd = true;
+	// In Part 1 we don't include the nodes themselves so we
+	// start at the next values out, push the nodes to the antiNodes list, then
+	// exit the loop after the first iteration.
+	if (!propogateToEnd) {
+		startNode[0] += distance[0];
+		startNode[1] += distance[1];
+		endNode[0] -= distance[0];
+		endNode[1] -= distance[1];
+	}
 	while (continueStart || continueEnd) {
-		continueStart = inBounds(startNode[0], rowMax) && inBounds(startNode[1], colMax);
-		continueEnd = inBounds(endNode[0], rowMax) && inBounds(endNode[1], colMax);
+		continueEnd = inBounds(endNode, maxCoords);
+		continueStart = inBounds(startNode, maxCoords);
 		if (continueStart) {
 			antiNodes.push(startNode.map((val) => val.toString()).join(','));
-			startNode[0] += dy;
-			startNode[1] += dx;
+			startNode[0] += distance[0];
+			startNode[1] += distance[1];
 		}
 		if (continueEnd) {
 			antiNodes.push(endNode.map((val) => val.toString()).join(','));
-			endNode[0] -= dy;
-			endNode[1] -= dx;
+			endNode[0] -= distance[0];
+			endNode[1] -= distance[1];
 		}
-		if (once) {
+		if (!propogateToEnd) {
 			continueStart = false;
 			continueEnd = false;
 		}
@@ -63,26 +69,24 @@ function propogate(
 }
 
 function getAntiNodes(
-	antennaPositions: Map<string, [number, number][]>,
-	rowMax: number,
-	colMax: number,
+	antennaPositions: Map<string, Point[]>,
+	maxCoords: Point,
 	propogateToEnd = false
 ) {
-	let antiNodes = new Set<string>();
+	const antiNodes = new Set<string>();
+	const current: Point = [0, 0];
+	const next: Point = [0, 0];
+	const distance: Point = [0, 0];
 	for (let [antenna, positions] of antennaPositions) {
 		for (let i = 0; i < positions.length - 1; i++) {
 			for (let j = i + 1; j < positions.length; j++) {
-				let next: [number, number] = [positions[j][0], positions[j][1]];
-				let current: [number, number] = [positions[i][0], positions[i][1]];
-				const dy = next[0] - current[0];
-				const dx = next[1] - current[1];
-				if (!propogateToEnd) {
-					next[0] += dy;
-					next[1] += dx;
-					current[0] -= dy;
-					current[1] -= dx;
-				}
-				for (let antiNode of propogate(next, current, rowMax, colMax, dy, dx, !propogateToEnd)) {
+				next[0] = positions[j][0];
+				next[1] = positions[j][1];
+				current[0] = positions[i][0];
+				current[1] = positions[i][1];
+				distance[0] = next[0] - current[0];
+				distance[1] = next[1] - current[1];
+				for (let antiNode of propogate(next, current, maxCoords, distance, propogateToEnd)) {
 					antiNodes.add(antiNode);
 				}
 			}
@@ -93,16 +97,18 @@ function getAntiNodes(
 
 function part1(input: string[]) {
 	const antennaPositions = getAntennaPositions(input);
-	const antiNodes = getAntiNodes(antennaPositions, input.length, input[0].length);
+	const antiNodes = getAntiNodes(antennaPositions, [input.length, input[0].length]);
 	return antiNodes.size;
 }
 
 function part2(input: string[]) {
 	const antennaPositions = getAntennaPositions(input);
-	const antiNodes = getAntiNodes(antennaPositions, input.length, input[0].length, true);
+	const antiNodes = getAntiNodes(antennaPositions, [input.length, input[0].length], true);
 	return antiNodes.size;
 }
 
+const test = Reader.read(8, 'test');
+// const input = Reader.read(8, 'input');
 Benchmark.run(part1, test);
 console.log('---------------------');
 Benchmark.run(part2, test);
