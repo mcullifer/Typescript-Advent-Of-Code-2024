@@ -10,7 +10,8 @@
 		"day4": "tsx src/day4/day4.ts",
 		"day5": "tsx src/day5/day5.ts",
 		"day6": "tsx src/day6/day6.ts",
-		"day7": "tsx src/day7/day7.ts"
+		"day7": "tsx src/day7/day7.ts",
+		"day8": "tsx src/day8/day8.ts"
 	},
 	"repository": {
 		"type": "git",
