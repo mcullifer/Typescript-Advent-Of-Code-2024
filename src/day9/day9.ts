@@ -60,11 +60,7 @@ function compact2(disk: string[]) {
 			blockCount += 1;
 		}
 		let freeStartIndex = findFreeSpace(disk, blockCount);
-		if (freeStartIndex === -1) {
-			i -= blockCount - 1;
-			continue;
-		}
-		if (freeStartIndex > i) {
+		if (freeStartIndex === -1 || freeStartIndex > i) {
 			i -= blockCount - 1;
 			continue;
 		}
@@ -106,4 +102,4 @@ function part2(input: string[]) {
 
 Benchmark.run(part1, test);
 console.log('---------------------');
-Benchmark.run(part2, test);
+Benchmark.run(part2, input);
