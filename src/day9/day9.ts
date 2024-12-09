@@ -96,7 +96,6 @@ function part1(input: string[]) {
 	return sum;
 }
 
-// Doesn't work RIP
 function part2(input: string[]) {
 	const diskMap = input[0];
 	const expanded = getExpandedFormat(diskMap);
