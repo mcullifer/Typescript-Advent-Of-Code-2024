@@ -63,9 +63,40 @@ function part2(input: string[]) {
 	for (let i = 0; i < input.length; i++) {
 		for (let j = 0; j < input.length; j++) {
 			if (visited.has([i, j].toString())) continue;
-			let [region, cornerCount] = BFS(visited, input, [i, j]);
-			let adjacentCount = 0;
-			cost += adjacentCount * region.size;
+			let [region, _] = BFS(visited, input, [i, j]);
+			let sides = 0;
+			for (let point of region) {
+				let [row, col] = point.split(',').map(Number);
+				let up = [row - 1, col].toString();
+				let down = [row + 1, col].toString();
+				let left = [row, col - 1].toString();
+				let right = [row, col + 1].toString();
+				if (!region.has(up) && !region.has(left)) {
+					sides += 1;
+				}
+				if (!region.has(up) && !region.has(right)) {
+					sides += 1;
+				}
+				if (!region.has(down) && !region.has(right)) {
+					sides += 1;
+				}
+				if (!region.has(down) && !region.has(left)) {
+					sides += 1;
+				}
+				if (region.has(up) && region.has(right) && !region.has([row - 1, col + 1].toString())) {
+					sides += 1;
+				}
+				if (region.has(up) && region.has(left) && !region.has([row - 1, col - 1].toString())) {
+					sides += 1;
+				}
+				if (region.has(down) && region.has(right) && !region.has([row + 1, col + 1].toString())) {
+					sides += 1;
+				}
+				if (region.has(down) && region.has(left) && !region.has([row + 1, col - 1].toString())) {
+					sides += 1;
+				}
+			}
+			cost += sides * region.size;
 		}
 	}
 	return cost;
