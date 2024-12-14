@@ -41,8 +41,7 @@ function part1(input: string[]) {
 	let quad1, quad2, quad3, quad4;
 	quad1 = quad2 = quad3 = quad4 = 0;
 	for (let robot of robots) {
-		let nextPos = getPosition(robot, seconds, cols, rows);
-		robot.pos = nextPos;
+		robot.pos = getPosition(robot, seconds, cols, rows);
 		if (robot.pos[0] === middleCol || robot.pos[1] === middleRow) continue;
 		if (robot.pos[0] < middleCol && robot.pos[1] < middleRow) {
 			quad1++;
@@ -69,8 +68,7 @@ function part2(input: string[]) {
 		uniques.clear();
 		elapsed++;
 		for (let robot of robots) {
-			let nextPos = getPosition(robot, 1, cols, rows);
-			robot.pos = nextPos;
+			robot.pos = getPosition(robot, 1, cols, rows);
 			uniques.add(robot.pos.toString());
 		}
 		if (uniques.size === robots.length) {
