@@ -25,9 +25,9 @@ function setup(input: string[]) {
 	return robots;
 }
 
-function getNext(robot: Robot, colMax: number, rowMax: number) {
-	let nextX = (robot.pos[0] + (robot.velocity[0] % colMax) + colMax) % colMax;
-	let nextY = (robot.pos[1] + (robot.velocity[1] % rowMax) + rowMax) % rowMax;
+function getPosition(robot: Robot, iterations: number, colMax: number, rowMax: number) {
+	let nextX = (robot.pos[0] + ((robot.velocity[0] * iterations) % colMax) + colMax) % colMax;
+	let nextY = (robot.pos[1] + ((robot.velocity[1] * iterations) % rowMax) + rowMax) % rowMax;
 	return [nextX, nextY] as Point;
 }
 
@@ -38,17 +38,11 @@ function part1(input: string[]) {
 	const middleRow = Math.floor(rows / 2);
 	const middleCol = Math.floor(cols / 2);
 	const seconds = 100;
-	for (let second = 0; second < seconds; second++) {
-		for (let robot of robots) {
-			let nextPos = getNext(robot, cols, rows);
-			robot.pos = nextPos;
-		}
-	}
-	let quad1 = 0;
-	let quad2 = 0;
-	let quad3 = 0;
-	let quad4 = 0;
+	let quad1, quad2, quad3, quad4;
+	quad1 = quad2 = quad3 = quad4 = 0;
 	for (let robot of robots) {
+		let nextPos = getPosition(robot, seconds, cols, rows);
+		robot.pos = nextPos;
 		if (robot.pos[0] === middleCol || robot.pos[1] === middleRow) continue;
 		if (robot.pos[0] < middleCol && robot.pos[1] < middleRow) {
 			quad1++;
@@ -65,22 +59,23 @@ function part1(input: string[]) {
 
 function part2(input: string[]) {
 	const robots = setup(input);
+	const maxSeconds = 100000;
 	const cols = 101;
 	const rows = 103;
 	const uniques = new Set<string>();
 	let allUniqueAt = -1;
 	let elapsed = 0;
-	while (allUniqueAt === -1) {
+	while (allUniqueAt === -1 && elapsed < maxSeconds) {
 		uniques.clear();
+		elapsed++;
 		for (let robot of robots) {
-			let nextPos = getNext(robot, cols, rows);
+			let nextPos = getPosition(robot, 1, cols, rows);
 			robot.pos = nextPos;
 			uniques.add(robot.pos.toString());
 		}
 		if (uniques.size === robots.length) {
 			allUniqueAt = elapsed;
 		}
-		elapsed++;
 	}
 	return elapsed;
 }
