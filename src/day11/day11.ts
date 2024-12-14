@@ -46,5 +46,4 @@ function part2(input: string[]): number {
 }
 
 Benchmark.run(part1, test);
-console.log('---------------------');
 Benchmark.run(part2, test);

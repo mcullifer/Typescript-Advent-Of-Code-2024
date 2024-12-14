@@ -76,5 +76,4 @@ function part2(input: string[]) {
 }
 // RIP 💀
 Benchmark.run(part1, test);
-console.log('---------------------');
 Benchmark.run(part2, test);

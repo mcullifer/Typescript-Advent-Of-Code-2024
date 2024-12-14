@@ -101,5 +101,4 @@ function part1And2(input: string[]) {
 }
 
 Benchmark.run(part1And2, test);
-console.log('---------------------');
 // Benchmark.run(part2, test);

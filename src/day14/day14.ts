@@ -1,9 +1,6 @@
 import { Benchmark } from '@/util/benchmark';
 import { Reader } from '@/util/reader';
 
-const test = Reader.read(14, 'test');
-const input = Reader.read(14, 'input');
-
 type Point = [number, number];
 
 type Robot = {
@@ -78,6 +75,7 @@ function part2(input: string[]) {
 	return elapsed;
 }
 
+const test = Reader.read(14, 'test');
+const input = Reader.read(14, 'input');
 Benchmark.run(part1, test);
-console.log('---------------------');
 Benchmark.run(part2, test);
