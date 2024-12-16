@@ -4,94 +4,107 @@ import { Reader } from '@/util/reader';
 type Point = [number, number];
 type Direction = '^' | 'v' | '<' | '>';
 class Box {
-	leftT: Point = [0, 0];
-	rightT: Point = [0, 0];
-	constructor(public pos: Point) {
-		this.leftT = [this.pos[0], this.pos[1] * 2];
-		this.rightT = [this.leftT[0], this.leftT[1] + 1];
-	}
-
-	get gpsCoordinateT() {
-		return 100 * this.leftT[0] + this.leftT[1];
+	left: Point;
+	right: Point;
+	leftChar: string;
+	rightChar: string;
+	constructor(left: Point, right?: Point) {
+		if (right !== undefined) {
+			this.left = left;
+			this.right = right;
+			this.leftChar = '[';
+			this.rightChar = ']';
+		} else {
+			this.left = this.right = left;
+			this.leftChar = this.rightChar = 'O';
+		}
 	}
 
 	get gpsCoordinate() {
-		return 100 * this.pos[0] + this.pos[1];
+		return 100 * this.left[0] + this.left[1];
 	}
 
 	move(direction: Direction) {
-		this.pos = addDirection(this.pos, direction);
-		this.leftT = addDirection(this.leftT, direction);
-		this.rightT = addDirection(this.rightT, direction);
-		return this.pos;
+		this.left = addDirection(this.left, direction);
+		this.right = addDirection(this.right, direction);
 	}
 
 	canMove(input: Array<string[]>, direction: Direction) {
-		let next = addDirection(this.pos, direction);
-		if (input[next[0]][next[1]] === '#') {
-			return false;
-		}
-		return true;
-	}
-
-	canMoveTransform(input: Array<string[]>, direction: Direction) {
-		let l = addDirection(this.leftT, direction);
-		let r = addDirection(this.rightT, direction);
-		if (input[l[0]][l[1]] === '#' || input[r[0]][r[1]] === '#') {
+		let nextLeft = addDirection(this.left, direction);
+		let nextRight = addDirection(this.right, direction);
+		if (input[nextLeft[0]][nextLeft[1]] === '#' || input[nextRight[0]][nextRight[1]] === '#') {
 			return false;
 		}
 		return true;
 	}
 
 	touchesHorizontally(box: Box, direction: Direction) {
-		const isInSameRow = box.leftT[0] === this.leftT[0] && box.rightT[0] === this.rightT[0];
+		const isInSameRow = box.left[0] === this.left[0] && box.right[0] === this.right[0];
 		const dir = direction === '<' ? -1 : 1;
-		const isNextTo = this.leftT[1] + dir === box.rightT[1] || this.rightT[1] + dir === box.leftT[1];
+		const isNextTo = this.left[1] + dir === box.right[1] || this.right[1] + dir === box.left[1];
 		return isInSameRow && isNextTo;
 	}
+
 	touchesVertically(box: Box, direction: Direction) {
-		let matchesLeft = this.leftT[1] === box.leftT[1] || this.leftT[1] === box.rightT[1];
-		let matchesRight = this.rightT[1] === box.leftT[1] || this.rightT[1] === box.rightT[1];
 		let dir = direction === '^' ? -1 : 1;
-		if (direction === '^') {
-			if (matchesLeft) {
-				return this.leftT[0] + dir === box.leftT[0] || this.leftT[0] + dir === box.rightT[0];
-			} else if (matchesRight) {
-				return this.rightT[0] + dir === box.leftT[0] || this.rightT[0] + dir === box.rightT[0];
-			}
-		} else if (direction === 'v') {
-			if (matchesLeft) {
-				return this.leftT[0] + dir === box.leftT[0] || this.leftT[0] + dir === box.rightT[0];
-			} else if (matchesRight) {
-				return this.rightT[0] + dir === box.leftT[0] || this.rightT[0] + dir === box.rightT[0];
-			}
-			return matchesLeft && this.leftT[0] + 1 === box.leftT[0];
-		}
-		return false;
+		let matchesLeftVertically =
+			this.left[0] + dir === box.left[0] || this.left[0] + dir === box.right[0];
+		let matchesRightVertically =
+			this.right[0] + dir === box.left[0] || this.right[0] + dir === box.right[0];
+		let touchesLeftHorizontally = this.left[1] === box.left[1] || this.left[1] === box.right[1];
+		let touchesRightHorizontally = this.right[1] === box.left[1] || this.right[1] === box.right[1];
+		return (
+			(matchesLeftVertically || matchesRightVertically) &&
+			(touchesLeftHorizontally || touchesRightHorizontally)
+		);
 	}
 }
 
-function setup(input: string[]): [Array<string[]>, Direction[], Point] {
+function setup(input: string[], double = false): [Array<string[]>, Direction[], Point, Box[]] {
 	let map: Array<string[]> = [];
 	let movements: Direction[] = [];
 	let start: Point = [0, 0];
 	let onMovements = false;
-	for (let line of input) {
-		if (line.length === 0) {
+	let boxes: Box[] = [];
+	for (let i = 0; i < input.length; i++) {
+		if (input[i].length === 0) {
 			onMovements = true;
 		}
 		if (onMovements) {
-			movements.push(...(line.split('') as Direction[]));
+			movements.push(...(input[i].split('') as Direction[]));
 		} else {
-			let split = line.split('');
-			let startCol = split.indexOf('@');
-			map.push(line.split(''));
-			if (startCol !== -1) {
-				start = [map.length - 1, startCol];
+			let toAdd = [];
+			for (let j = 0; j < input[i].length; j++) {
+				let char = input[i][j];
+				if (char === 'O') {
+					if (double) {
+						boxes.push(new Box([i, toAdd.length], [i, toAdd.length + 1]));
+						toAdd.push('[');
+						toAdd.push(']');
+					} else {
+						toAdd.push('O');
+						boxes.push(new Box([i, j]));
+					}
+				} else if (char === '@') {
+					if (double) {
+						start = [i, toAdd.length];
+						toAdd.push('@');
+						toAdd.push('.');
+					} else {
+						toAdd.push('@');
+						start = [i, j];
+					}
+				} else {
+					toAdd.push(char);
+					if (double) {
+						toAdd.push(char);
+					}
+				}
 			}
+			map.push(toAdd);
 		}
 	}
-	return [map, movements, start];
+	return [map, movements, start, boxes];
 }
 
 function addDirection(pos: Point, dir: 'v' | '^' | '<' | '>'): Point {
@@ -107,60 +120,30 @@ function addDirection(pos: Point, dir: 'v' | '^' | '<' | '>'): Point {
 	}
 }
 
-function push(map: Array<string[]>, current: Point, direction: Direction) {
-	let stack: Point[] = [current];
-	let pointer = current;
-	let hitWall = false;
-	while (map[pointer[0]][pointer[1]] !== '#' && map[pointer[0]][pointer[1]] !== '.') {
-		let next = addDirection(pointer, direction);
-		let nextChar = map[next[0]][next[1]];
-		if (nextChar === '#') {
-			hitWall = true;
-			break;
-		} else if (nextChar === '.') {
-			stack.push(next);
-			break;
-		} else if (nextChar === 'O') {
-			stack.push(next);
-		}
-		pointer = next;
-	}
-	if (hitWall) {
-		return current;
-	}
-	for (let i = stack.length - 1; i >= 0; i--) {
-		let point = stack[i];
-		if (i > 0) {
-			let next = stack[i - 1];
-			map[point[0]][point[1]] = map[next[0]][next[1]];
-		} else {
-			map[point[0]][point[1]] = '.';
-		}
-	}
-	return addDirection(current, direction);
-}
-
-function BFS(box: Box, boxes: Box[], direction: Direction) {
-	let q: Box[] = [box];
-	let c: Box | undefined;
+function DFS(box: Box, boxes: Box[], direction: Direction) {
+	let queue: Box[] = [box];
+	let current: Box | undefined;
 	let touchingBoxes = [];
 	let visited = new Set<string>();
 	const vertical = direction === '^' || direction === 'v';
-	while (q.length > 0) {
-		c = q.shift();
-		if (!c) break;
-		visited.add(c.leftT.toString());
-		let touches = boxes.filter((b) => {
-			if (vertical) {
-				return c?.touchesVertically(b, direction);
-			} else {
-				return c?.touchesHorizontally(b, direction);
-			}
-		});
-		touchingBoxes.push(c);
-		for (let touching of touches) {
-			if (!visited.has(touching.leftT.toString())) {
-				q.push(touching);
+	while (queue.length > 0) {
+		current = queue.pop();
+		if (!current) break;
+		visited.add(current.left.toString());
+		touchingBoxes.push(current);
+		for (let i = 0; i < boxes.length; i++) {
+			if (
+				vertical &&
+				current.touchesVertically(boxes[i], direction) &&
+				!visited.has(boxes[i].left.toString())
+			) {
+				queue.push(boxes[i]);
+			} else if (
+				!vertical &&
+				current.touchesHorizontally(boxes[i], direction) &&
+				!visited.has(boxes[i].left.toString())
+			) {
+				queue.push(boxes[i]);
 			}
 		}
 	}
@@ -180,90 +163,56 @@ function push2(map: Array<string[]>, current: Point, direction: Direction, boxes
 	}
 	let box = boxes.find(
 		(box) =>
-			(box.leftT[0] === next[0] && box.leftT[1] === next[1]) ||
-			(box.rightT[0] === next[0] && box.rightT[1] === next[1])
+			(box.left[0] === next[0] && box.left[1] === next[1]) ||
+			(box.right[0] === next[0] && box.right[1] === next[1])
 	);
 	if (!box) {
-		return current;
+		return next;
 	}
-	let touchingBoxes = BFS(box, boxes, direction);
-	let canMove = [];
-	for (let touching of touchingBoxes) {
-		if (touching.canMoveTransform(map, direction)) {
-			canMove.push(touching);
+	let touchingBoxes = DFS(box, boxes, direction);
+	let canMove = 0;
+	for (let i = 0; i < touchingBoxes.length; i++) {
+		if (touchingBoxes[i].canMove(map, direction)) {
+			canMove++;
 		}
 	}
-	if (canMove.length !== touchingBoxes.length) {
+	if (canMove !== touchingBoxes.length) {
 		return current;
 	}
 	for (let i = touchingBoxes.length - 1; i >= 0; i--) {
-		let touching = touchingBoxes[i];
-		map[touching.leftT[0]][touching.leftT[1]] = '.';
-		map[touching.rightT[0]][touching.rightT[1]] = '.';
-		touching.move(direction);
-		map[touching.leftT[0]][touching.leftT[1]] = '[';
-		map[touching.rightT[0]][touching.rightT[1]] = ']';
+		map[touchingBoxes[i].left[0]][touchingBoxes[i].left[1]] = '.';
+		map[touchingBoxes[i].right[0]][touchingBoxes[i].right[1]] = '.';
+		touchingBoxes[i].move(direction);
+		map[touchingBoxes[i].left[0]][touchingBoxes[i].left[1]] = touchingBoxes[i].leftChar;
+		map[touchingBoxes[i].right[0]][touchingBoxes[i].right[1]] = touchingBoxes[i].rightChar;
 	}
 	map[next[0]][next[1]] = '@';
 	map[current[0]][current[1]] = '.';
 	return next;
 }
 
-function gpsCoordinate(pos: Point) {
-	return 100 * pos[0] + pos[1];
-}
-
-function printMap(map: Array<string[]>) {
-	for (let line of map) {
-		console.log(line.join(''));
-	}
-}
-
 function part1(input: string[]) {
-	let [map, movements, start] = setup(input);
+	let [map, movements, start, boxes] = setup(input);
 	let pos = start;
 	for (let movement of movements) {
-		pos = push(map, pos, movement);
+		pos = push2(map, pos, movement, boxes);
 	}
 	let sum = 0;
-	for (let i = 0; i < map.length; i++) {
-		for (let j = 0; j < map[i].length; j++) {
-			if (map[i][j] === 'O') {
-				sum += gpsCoordinate([i, j]);
-			}
-		}
+	for (let box of boxes) {
+		sum += box.gpsCoordinate;
 	}
 	return sum;
 }
 
 function part2(input: string[]) {
-	let [map, movements, start] = setup(input);
-	let newMap: Array<string[]> = [];
-	let boxes: Box[] = [];
-	for (let i = 0; i < map.length; i++) {
-		newMap.push([]);
-		for (let j = 0; j < map[i].length; j++) {
-			let char = map[i][j];
-			if (char === '#') {
-				newMap[i].push(...['#', '#']);
-			} else if (char === 'O') {
-				newMap[i].push(...['[', ']']);
-				boxes.push(new Box([i, j]));
-			} else if (char === '.') {
-				newMap[i].push(...['.', '.']);
-			} else if (char === '@') {
-				newMap[i].push(...['@', '.']);
-			}
-		}
-	}
-	let newStart = newMap[start[0]].findIndex((char) => char === '@');
-	let pos: Point = [start[0], newStart];
+	let [map, movements, start, boxes] = setup(input, true);
+	let pos = start;
 	for (let movement of movements) {
-		pos = push2(newMap, pos, movement, boxes);
+		pos = push2(map, pos, movement, boxes);
 	}
 	let sum = 0;
 	for (let box of boxes) {
-		sum += box.gpsCoordinateT;
+		sum += box.gpsCoordinate;
 	}
 
 	return sum;
