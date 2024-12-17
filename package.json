@@ -4,6 +4,7 @@
 	"description": "Advent of Code 2024 solutions",
 	"main": "index.ts",
 	"scripts": {
+		"create-day": "tsx scripts/add-day.ts",
 		"day1": "tsx src/day1/day1.ts",
 		"day2": "tsx src/day2/day2.ts",
 		"day3": "tsx src/day3/day3.ts",
@@ -18,7 +19,8 @@
 		"day12": "tsx src/day12/day12.ts",
 		"day13": "tsx src/day13/day13.ts",
 		"day14": "tsx src/day14/day14.ts",
-		"day15": "tsx src/day15/day15.ts"
+		"day15": "tsx src/day15/day15.ts",
+		"day16": "tsx src/day16/day16.ts"
 	},
 	"repository": {
 		"type": "git",
