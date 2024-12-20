@@ -70,10 +70,7 @@ function part2(input: string[]) {
 	return possibleCount;
 }
 
-// 280 is too low
-// Part1: 298
-// Part2: 572248688842069
 const test = Reader.read(19, 'test');
 const input = Reader.read(19, 'input');
-Benchmark.run(part1, input);
-Benchmark.run(part2, input);
+Benchmark.run(part1, test);
+Benchmark.run(part2, test);
