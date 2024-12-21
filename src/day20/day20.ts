@@ -46,7 +46,7 @@ function inBounds(grid: Grid, point: Point): boolean {
 	return inGrid && notWall;
 }
 
-function BFS(grid: Grid, start: Point, end: Point) {
+function DFS(grid: Grid, start: Point, end: Point) {
 	let queue: State[] = [{ pos: start, steps: 0, canCheatAt: [], visited: new Set() }];
 	while (queue.length > 0) {
 		let current = queue.pop();
@@ -96,7 +96,7 @@ function getStepsSaved(state: State) {
 
 function part1(input: string[]) {
 	const [grid, start, end] = setup(input);
-	const result = BFS(grid, start, end);
+	const result = DFS(grid, start, end);
 	if (result === null) {
 		console.log('No path found');
 		return;
