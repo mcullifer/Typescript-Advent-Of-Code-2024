@@ -80,15 +80,17 @@ function getStepsSaved(state: State) {
 	let visited = Array.from(state.visited.values());
 	let stepsSaved = new Map<number, number>();
 	for (let [from, to] of state.canCheatAt) {
-		let fromIndex = visited.indexOf(from.toString());
-		let toIndex = visited.indexOf(to.toString());
-		if (toIndex === -1 || fromIndex === -1) continue;
-		let total = toIndex - fromIndex - 2;
-		let existing = stepsSaved.get(total);
-		if (existing === undefined) {
-			stepsSaved.set(total, 1);
-		} else {
-			stepsSaved.set(total, existing + 1);
+		let distance = Math.abs(from[0] - to[0]) + Math.abs(from[1] - to[1]);
+		if (distance <= 2) {
+			let fromIndex = visited.indexOf(from.toString());
+			let toIndex = visited.indexOf(to.toString());
+			if (fromIndex === -1 || toIndex === -1) continue;
+			let saved = toIndex - fromIndex - distance;
+			if (stepsSaved.has(saved)) {
+				stepsSaved.set(saved, stepsSaved.get(saved)! + 1);
+			} else {
+				stepsSaved.set(saved, 1);
+			}
 		}
 	}
 	return stepsSaved;
@@ -107,9 +109,23 @@ function part1(input: string[]) {
 	return total;
 }
 
-function part2(input: string[]) {}
+// This is incorrect
+function part2(input: string[]) {
+	const [grid, start, end] = setup(input);
+	const result = DFS(grid, start, end);
+	if (result === null) {
+		console.log('No path found');
+		return;
+	}
+	let stepsSaved = getStepsSaved(result);
+	// I think I need to get the manhattan distance of each point on the valid path
+	// from each other as long as they're less than 20?
+	let atLeast100 = Array.from(stepsSaved.keys()).filter((x) => x >= 100);
+	let total = atLeast100.reduce((acc, x) => acc + stepsSaved.get(x)!, 0);
+	return total;
+}
 
 const test = Reader.read(20, 'test');
 const input = Reader.read(20, 'input');
-Benchmark.run(part1, input);
+Benchmark.run(part1, test);
 Benchmark.run(part2, test);
