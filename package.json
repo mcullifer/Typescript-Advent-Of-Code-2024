@@ -24,7 +24,8 @@
 		"day17": "tsx src/day17/day17.ts",
 		"day18": "tsx src/day18/day18.ts",
 		"day19": "tsx src/day19/day19.ts",
-		"day20": "tsx src/day20/day20.ts"
+		"day20": "tsx src/day20/day20.ts",
+		"day21": "tsx src/day21/day21.ts"
 	},
 	"repository": {
 		"type": "git",
