@@ -40,47 +40,44 @@ function part1(input: string[]) {
 function part2(input: string[]) {
 	const secretNumbers = input.map((line) => parseInt(line));
 	const numsPerDay = 2000;
-	let diffsPerSecretNumber = [];
-	let ones = [];
+	let sequences = [];
 	for (let secretNumber of secretNumbers) {
-		let sequence = [secretNumber];
-		let onesPlace = [];
-		let diffs = [];
+		let seq = [secretNumber];
 		for (let i = 0; i < numsPerDay; i++) {
-			let str = secretNumber.toString();
-			onesPlace.push(parseInt(str[str.length - 1]));
 			secretNumber = getNextSecretNumber(secretNumber);
-			sequence.push(secretNumber);
-			if (i === 0) continue;
-			let diff = onesPlace[i] - onesPlace[i - 1];
-			diffs.push(diff);
+			seq.push(secretNumber);
 		}
-		diffsPerSecretNumber.push(diffs);
-		ones.push(onesPlace);
+		sequences.push(seq);
 	}
-	let offset = 4;
-	let sequenceMap = new Map<string, number>();
-	let sequenceId = '';
+	let sequenceSums = new Map<string, number>();
+	let seen = new Set<string>();
 	let maxSum = 0;
 	let maxSequence = '';
-	let seen = new Set<string>();
-	for (let i = 0; i < diffsPerSecretNumber.length; i++) {
+	for (let sequence of sequences) {
 		seen.clear();
-		for (let j = 0; j < diffsPerSecretNumber[i].length - offset; j++) {
-			sequenceId = diffsPerSecretNumber[i].slice(j, j + offset).join(',');
+		for (let j = 1; j < sequence.length - 3; j++) {
+			let seq = [];
+			let lastOnesPlace = 0;
+			for (let k = 0; k < 4; k++) {
+				let prevOnesPlace = sequence[j + k - 1] % 10;
+				let currentOnesPlace = sequence[j + k] % 10;
+				let diff = currentOnesPlace - prevOnesPlace;
+				if (k === 3) {
+					lastOnesPlace = currentOnesPlace;
+				}
+				seq.push(diff);
+			}
+			let sequenceId = `${seq[0]},${seq[1]},${seq[2]},${seq[3]}`;
 			if (seen.has(sequenceId)) continue;
 			seen.add(sequenceId);
-			let nextNumber = ones[i][j + offset];
-			let existing = sequenceMap.get(sequenceId) ?? 0;
-			let next = existing + nextNumber;
-			sequenceMap.set(sequenceId, next);
+			let next = (sequenceSums.get(sequenceId) ?? 0) + lastOnesPlace;
+			sequenceSums.set(sequenceId, next);
 			if (next > maxSum) {
 				maxSum = next;
 				maxSequence = sequenceId;
 			}
 		}
 	}
-	console.log(maxSequence, maxSum);
 	return maxSum;
 }
 
