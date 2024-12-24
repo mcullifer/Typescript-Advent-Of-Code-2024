@@ -65,7 +65,22 @@ function part2(input: string[]) {
 	};
 
 	// Step 2: Bron-Kerbosch Algorithm for finding cliques
-	const bronKerbosch = (r, p, x, graph, cliques) => {
+	/**
+	 *
+	 * @param r Nodes currently forming the clique.
+	 * @param p Nodes that can potentially be added to R to expand the clique.
+	 * @param x Nodes already processed (to avoid duplicates).
+	 * @param graph
+	 * @param cliques
+	 * @returns
+	 */
+	const bronKerbosch = (
+		r: Set<string>,
+		p: Set<string>,
+		x: Set<string>,
+		graph: Record<string, Set<string>>,
+		cliques: string[][]
+	) => {
 		if (p.size === 0 && x.size === 0) {
 			// Found a maximal clique
 			cliques.push([...r]);
@@ -97,16 +112,11 @@ function part2(input: string[]) {
 	const graph = buildGraph(input);
 	const cliques: string[][] = [];
 	bronKerbosch(new Set(), new Set(Object.keys(graph)), new Set(), graph, cliques);
-	const largestCliques = findLargestCliques(cliques);
-
-	// console.log('All Cliques:', cliques);
-	// console.log('Largest Cliques:', largestCliques);
-	let largest = largestCliques[0];
-	largest.sort((a, b) => a.localeCompare(b));
-	return largestCliques[0];
+	const largestClique = findLargestCliques(cliques)[0].sort();
+	return largestClique;
 }
 
 const test = Reader.read(23, 'test');
 const input = Reader.read(23, 'input');
-Benchmark.run(part1, test);
-Benchmark.run(part2, test);
+Benchmark.run(part1, input);
+Benchmark.run(part2, input);
