@@ -12,7 +12,6 @@ function setup(input: string[]) {
 		existing2.push(first);
 		connections.set(second, existing2);
 	}
-	console.log(connections);
 	return connections;
 }
 
@@ -100,8 +99,8 @@ function part2(input: string[]) {
 	bronKerbosch(new Set(), new Set(Object.keys(graph)), new Set(), graph, cliques);
 	const largestCliques = findLargestCliques(cliques);
 
-	console.log('All Cliques:', cliques);
-	console.log('Largest Cliques:', largestCliques);
+	// console.log('All Cliques:', cliques);
+	// console.log('Largest Cliques:', largestCliques);
 	let largest = largestCliques[0];
 	largest.sort((a, b) => a.localeCompare(b));
 	return largestCliques[0];
@@ -110,4 +109,4 @@ function part2(input: string[]) {
 const test = Reader.read(23, 'test');
 const input = Reader.read(23, 'input');
 Benchmark.run(part1, test);
-Benchmark.run(part2, input);
+Benchmark.run(part2, test);
