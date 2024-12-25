@@ -28,20 +28,14 @@ function setup(input: string[]) {
 
 function part1(input: string[]) {
 	const { keys, locks } = setup(input);
-	let lockAndKeys = new Map<string, string[]>();
 	const h = 7;
+	let sum = 0;
 	for (let lock of locks) {
 		for (let key of keys) {
 			if (lock.every((v, i) => v + key[i] < h - 1)) {
-				let existing = lockAndKeys.get(lock.join('')) ?? [];
-				existing.push(key.join(''));
-				lockAndKeys.set(lock.join(''), existing);
+				sum++;
 			}
 		}
-	}
-	let sum = 0;
-	for (let [lock, keys] of lockAndKeys) {
-		sum += keys.length;
 	}
 	return sum;
 }
