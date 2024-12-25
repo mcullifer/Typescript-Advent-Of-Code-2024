@@ -117,47 +117,90 @@ function part1(input: string[]) {
 	return binaryToDecimal(zWires);
 }
 
-function part2(input: string[]) {
-	let { wires, gates, missing } = setup(input);
-	solve(wires, gates, missing);
-	let xWires = Array.from(wires.values())
-		.filter((w) => w.name.startsWith('x'))
-		.sort((a, b) => b.id - a.id)
-		.reduce((acc, wire) => acc + wire.value, '');
-	let yWires = Array.from(wires.values())
-		.filter((w) => w.name.startsWith('y'))
-		.sort((a, b) => b.id - a.id)
-		.reduce((acc, wire) => acc + wire.value, '');
-	let zWires = Array.from(wires.values())
-		.filter((w) => w.name.startsWith('z'))
-		.sort((a, b) => b.id - a.id)
-		.reduce((acc, wire) => acc + wire.value, '');
-	let decX = binaryToDecimal(xWires);
-	let decY = binaryToDecimal(yWires);
-	let res = decX & decY;
-	xWires = xWires;
-	yWires = yWires;
-	let bad = [];
-	for (let j = 0; j < xWires.length; j++) {
-		if ((parseInt(xWires[j]) & parseInt(yWires[j])) !== parseInt(zWires[j])) {
-			bad.push(j);
-		}
+function bothNames(g: Gate, name1: string, name2: string) {
+	return (
+		(g.input1.name === name1 || g.input2.name === name1) &&
+		(g.input1.name === name2 || g.input2.name === name2)
+	);
+}
+class HalfAdder {
+	constructor(
+		public a: Wire,
+		public b: Wire
+	) {}
+
+	s(gates: Gate[]) {
+		return gates.find((g) => bothNames(g, this.a.name, this.b.name) && g.op === 'XOR')?.output;
 	}
-	console.log(bad);
-	console.log('0' + xWires, 'X');
-	console.log('0' + yWires, 'Y');
-	console.log(zWires, 'Z');
-	console.log(decimalToBinary(res), 'X & Y');
-	console.log(res, binaryToDecimal(zWires));
-	let zs = Array.from(wires.values())
-		.filter((w) => w.name.startsWith('z'))
-		.sort((a, b) => b.id - a.id);
-	for (let z = 0; z < bad.length; z++) {
-		console.log(zs[z].name);
+
+	c(gates: Gate[]) {
+		return gates.find((g) => bothNames(g, this.a.name, this.b.name) && g.op === 'AND')?.output;
+	}
+}
+class FullAdder {
+	constructor(
+		public a: Wire,
+		public b: Wire,
+		public cIn: Wire
+	) {}
+	s(gates: Gate[]) {
+		let aANDb = gates.find((g) => bothNames(g, this.a.name, this.b.name) && g.op === 'AND');
+		let aXORb = gates.find((g) => bothNames(g, this.a.name, this.b.name) && g.op === 'XOR');
+		let abANDcIn = gates.find(
+			(g) => bothNames(g, aXORb?.output.name ?? '', this.cIn.name) && g.op === 'AND'
+		);
+		let bothAnd = gates.find(
+			(g) => bothNames(g, abANDcIn?.output.name ?? '', aANDb?.output.name ?? '') && g.op === 'OR'
+		);
+		let abXORcIn = gates.find(
+			(g) => bothNames(g, aXORb?.output.name ?? '', this.cIn.name ?? '') && g.op === 'XOR'
+		);
+		return abXORcIn?.output;
+	}
+	c(gates: Gate[]) {
+		let aANDb = gates.find((g) => bothNames(g, this.a.name, this.b.name) && g.op === 'AND');
+		let aXORb = gates.find((g) => bothNames(g, this.a.name, this.b.name) && g.op === 'XOR');
+		let abANDcIn = gates.find(
+			(g) => bothNames(g, aXORb?.output.name ?? '', this.cIn.name ?? '') && g.op === 'AND'
+		);
+		let bothAnd = gates.find(
+			(g) => bothNames(g, abANDcIn?.output.name ?? '', aANDb?.output.name ?? '') && g.op === 'OR'
+		);
+		return bothAnd?.output;
 	}
 }
 
+// yeah this is extremely disgusting. I'm trying to find where it breaks
+// and it does break which is great but I'm not sure how to like continue because
+// everything depends on the previous value
+function part2(input: string[]) {
+	let { wires, gates, missing } = setup(input);
+	solve(wires, gates, missing);
+	let xs = Array.from(wires.values())
+		.filter((w) => w.name.startsWith('x'))
+		.sort((a, b) => a.id - b.id);
+	let ys = Array.from(wires.values())
+		.filter((w) => w.name.startsWith('y'))
+		.sort((a, b) => a.id - b.id);
+	let firstX = xs[0];
+	let firstY = ys[0];
+	let halfAdder = new HalfAdder(firstX, firstY);
+	let gatesArray = Array.from(gates.values());
+	let s = halfAdder.s(gatesArray);
+	let c = halfAdder.c(gatesArray);
+	let full = new FullAdder(xs[1], ys[1], c);
+	for (let j = 1; j < xs.length; j++) {
+		try {
+			full = new FullAdder(xs[j], ys[j], c!);
+			c = full.c(gatesArray);
+			console.log(full);
+		} catch {
+			console.log(c);
+			console.log(full);
+		}
+	}
+}
 const test = Reader.read(24, 'test');
 const input = Reader.read(24, 'input');
 Benchmark.run(part1, test);
-Benchmark.run(part2, input);
+Benchmark.run(part2, test);
