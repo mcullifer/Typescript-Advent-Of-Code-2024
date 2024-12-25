@@ -165,8 +165,7 @@ function part2(input: string[]) {}
 // 188892 is too high
 const test = Reader.read(21, 'test');
 const input = Reader.read(21, 'input');
-Benchmark.run(part1, test);
-Benchmark.run(part2, test);
+Benchmark.withTitle(21).run(part1, test).run(part2, test);
 // <vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A
 // v<<A>>^A<A>AvA<^AA>A<vAAA>^A
 // <A^A>^^AvvvA

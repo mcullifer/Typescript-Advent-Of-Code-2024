@@ -118,5 +118,4 @@ function part2(input: string[]) {
 
 const test = Reader.read(23, 'test');
 const input = Reader.read(23, 'input');
-Benchmark.run(part1, test);
-Benchmark.run(part2, test);
+Benchmark.withTitle(23).run(part1, test).run(part2, test);

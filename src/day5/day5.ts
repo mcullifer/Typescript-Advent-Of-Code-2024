@@ -1,9 +1,6 @@
 import { Benchmark } from '@/util/benchmark';
 import { Reader } from '@/util/reader';
 
-const test = Reader.read(5, 'test');
-const input = Reader.read(5, 'input');
-
 function updateOrderMap(line: string, orderMap: Map<string, string[]>) {
 	let [key, val] = line.split('|');
 	let existing = orderMap.get(key);
@@ -93,5 +90,6 @@ function part2(input: string[]) {
 	return sum;
 }
 
-Benchmark.run(part1, test);
-Benchmark.run(part2, test);
+const test = Reader.read(5, 'test');
+const input = Reader.read(5, 'input');
+Benchmark.withTitle(5).run(part1, test).run(part2, test);

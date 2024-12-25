@@ -1,9 +1,6 @@
 import { Benchmark } from '@/util/benchmark';
 import { Reader } from '@/util/reader';
 
-const test = Reader.read(9, 'test', true);
-const input = Reader.read(9, 'input', true);
-
 function getExpandedFormat(diskMap: string) {
 	let expanded: string[] = [];
 	let id = 0;
@@ -100,5 +97,6 @@ function part2(input: string[]) {
 	return sum;
 }
 
-Benchmark.run(part1, test);
-Benchmark.run(part2, test);
+const test = Reader.read(9, 'test', true);
+const input = Reader.read(9, 'input', true);
+Benchmark.withTitle(9).run(part1, test).run(part2, test);

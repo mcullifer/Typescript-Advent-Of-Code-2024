@@ -42,4 +42,4 @@ function part1(input: string[]) {
 
 const test = Reader.read(25, 'test');
 const input = Reader.read(25, 'input');
-Benchmark.run(part1, test);
+Benchmark.withTitle(25, 'Code Chronicle').run(part1, test);

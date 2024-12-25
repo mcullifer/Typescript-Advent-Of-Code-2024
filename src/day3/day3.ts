@@ -1,9 +1,6 @@
 import { Benchmark } from '@/util/benchmark';
 import { Reader } from '@/util/reader';
 
-const test = Reader.read(3, 'test', true);
-const input = Reader.read(3, 'input', true);
-
 function part1(input: string[]) {
 	let line = input[0];
 	let results = 0;
@@ -35,5 +32,6 @@ function part2(input: string[]) {
 	return results;
 }
 
-Benchmark.run(part1, test);
-Benchmark.run(part2, test);
+const test = Reader.read(3, 'test', true);
+const input = Reader.read(3, 'input', true);
+Benchmark.withTitle(3).run(part1, test).run(part2, test);

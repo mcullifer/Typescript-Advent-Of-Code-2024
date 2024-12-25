@@ -1,9 +1,6 @@
 import { Benchmark } from '@/util/benchmark';
 import { Reader } from '@/util/reader';
 
-const test = Reader.read(10, 'test');
-const input = Reader.read(10, 'input');
-
 type Point = [number, number];
 
 const directions: Point[] = [
@@ -77,5 +74,6 @@ function part2(input: string[]) {
 	return trails;
 }
 
-Benchmark.run(part1, test);
-Benchmark.run(part2, test);
+const test = Reader.read(10, 'test');
+const input = Reader.read(10, 'input');
+Benchmark.withTitle(10).run(part1, test).run(part2, test);

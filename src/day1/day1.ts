@@ -1,9 +1,6 @@
 import { Benchmark } from '@/util/benchmark';
 import { Reader } from '@/util/reader';
 
-const test = Reader.read(1, 'test');
-const input = Reader.read(1, 'input');
-
 function setup(input: string[]): [number[], number[]] {
 	let left = Array(input.length).fill(0);
 	let right = Array(input.length).fill(0);
@@ -56,5 +53,6 @@ function part2(input: string[]): number {
 	return sum;
 }
 
-Benchmark.run(part1, test);
-Benchmark.run(part2, test);
+const test = Reader.read(1, 'test');
+const input = Reader.read(1, 'input');
+Benchmark.withTitle(1).run(part1, test).run(part2, test);

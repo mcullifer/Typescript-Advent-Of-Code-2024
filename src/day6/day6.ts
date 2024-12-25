@@ -1,9 +1,6 @@
 import { Benchmark } from '@/util/benchmark';
 import { Reader } from '@/util/reader';
 
-const test = Reader.read(6, 'test');
-const input = Reader.read(6, 'input');
-
 const rowInBounds = (row: number, source: string[]) => row >= 0 && row < source.length;
 const colInBounds = (col: number, source: string[]) => col >= 0 && col < source[0].length;
 const direction = [
@@ -100,5 +97,6 @@ function part1And2(input: string[]) {
 	return DFS(input, start);
 }
 
-Benchmark.run(part1And2, test);
-// Benchmark.run(part2, test);
+const test = Reader.read(6, 'test');
+const input = Reader.read(6, 'input');
+Benchmark.withTitle(6).run(part1And2, test);
