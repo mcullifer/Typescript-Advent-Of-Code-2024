@@ -1,9 +1,6 @@
 import { Benchmark } from '@/util/benchmark';
 import { Reader } from '@/util/reader';
 
-const test = Reader.read(13, 'test');
-const input = Reader.read(13, 'input');
-
 type ClawGame = {
 	buttonA: [number, number];
 	buttonB: [number, number];
@@ -77,5 +74,6 @@ function part2(input: string[]) {
 	return sum;
 }
 
-Benchmark.run(part1, test);
-Benchmark.run(part2, test);
+const test = Reader.read(13, 'test');
+const input = Reader.read(13, 'input');
+Benchmark.withTitle(13).run(part1, test).run(part2, test);

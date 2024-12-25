@@ -1,9 +1,6 @@
 import { Benchmark } from '@/util/benchmark';
 import { Reader } from '@/util/reader';
 
-const test = Reader.read(4, 'test');
-const input = Reader.read(4, 'input');
-
 const directions = [
 	[-1, 0], // UP
 	[1, 0], // DOWN
@@ -74,6 +71,7 @@ function part2(input: string[]) {
 	}
 	return count;
 }
+const test = Reader.read(4, 'test');
+const input = Reader.read(4, 'input');
 // RIP 💀
-Benchmark.run(part1, test);
-Benchmark.run(part2, test);
+Benchmark.withTitle(4).run(part1, test).run(part2, test);

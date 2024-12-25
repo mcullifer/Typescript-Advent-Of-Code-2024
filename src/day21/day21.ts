@@ -10,6 +10,11 @@ type Node = {
 	dist: number;
 	end: string;
 };
+type Keybind = {
+	for: string;
+	pos: Point;
+	combo: string; // Must end in A
+};
 const dirMap: Record<string, string> = {
 	'-1,0': '^',
 	'1,0': 'v',
@@ -42,7 +47,42 @@ const keypadStart: Point = [3, 2];
 const arrowStart: Point = [0, 2];
 
 function inBounds(grid: string[][], point: Point) {
-	return point[0] >= 0 && point[0] < grid.length && point[1] >= 0 && point[1] < grid[0].length;
+	return (
+		point[0] >= 0 &&
+		point[0] < grid.length &&
+		point[1] >= 0 &&
+		point[1] < grid[0].length &&
+		grid[point[0]][point[1]] !== '#'
+	);
+}
+
+function boogie(grid: string[][], start: Point, end: string) {
+	let queue: Keybind[] = [{ for: end, pos: start, combo: '' }];
+	let visited = new Set<string>();
+	let potentialKeybinds: Keybind[] = [];
+	while (queue.length > 0) {
+		let current = queue.shift();
+		if (!current) break;
+		visited.add(current.pos.toString());
+		if (grid[current.pos[0]][current.pos[1]] === end) {
+			current.combo += 'A';
+			potentialKeybinds.push(current);
+			continue;
+		}
+		for (let dir of dirs) {
+			let next: Point = [current.pos[0] + dir[0], current.pos[1] + dir[1]];
+			if (inBounds(grid, next) && !visited.has(next.toString())) {
+				queue.push({
+					for: current.for,
+					pos: next,
+					combo: current.combo.concat(dirMap[dir.toString()])
+				});
+			}
+		}
+	}
+	potentialKeybinds = potentialKeybinds.sort((a, b) => a.combo.length - b.combo.length);
+	potentialKeybinds.filter((k) => k.combo.length === potentialKeybinds[0].combo.length);
+	return potentialKeybinds;
 }
 
 function BFS(grid: string[][], start: Point, end: string, first = false) {
@@ -92,25 +132,30 @@ function getInputs(numInput: Node[]) {
 	return results;
 }
 
+function robo(keybind: Keybind, maxDepth = 2) {
+	let start = arrowStart;
+	for (let char of keybind.combo) {
+		let potentialKeybinds = boogie(keypad, start, char);
+	}
+}
+
 function part1(input: string[]) {
 	let sum = 0;
 	for (let code of input) {
 		let start = keypadStart;
-		let keypadResults: Node[] = [];
+		let final = '';
 		for (let char of code) {
-			let result = BFS(keypad, start, char);
-			if (!result) return [];
-			start = result.pos;
-			let temp = [result];
-			for (let i = 0; i < 2; i++) {
-				temp = getInputs(temp);
+			let keybinds = boogie(keypad, start, char);
+			start = keybinds[0].pos;
+			for (let potentialKeybind of keybinds) {
+				robo(potentialKeybind);
 			}
-			keypadResults.push(...temp);
 		}
-		let resultLength = keypadResults.reduce((acc, val) => val.visited.size + acc, 0);
-		let numPartOfCode = parseInt(code.replace('A', ''));
-		console.log(resultLength, numPartOfCode);
-		sum += numPartOfCode * resultLength;
+		if (code === '029A') {
+			console.log(final);
+		}
+		sum += final.length * parseInt(code.replace('A', ''));
+		console.log('-----------------');
 	}
 	return sum;
 }
@@ -120,8 +165,7 @@ function part2(input: string[]) {}
 // 188892 is too high
 const test = Reader.read(21, 'test');
 const input = Reader.read(21, 'input');
-Benchmark.run(part1, test);
-Benchmark.run(part2, test);
+Benchmark.withTitle(21).run(part1, test).run(part2, test);
 // <vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A
 // v<<A>>^A<A>AvA<^AA>A<vAAA>^A
 // <A^A>^^AvvvA

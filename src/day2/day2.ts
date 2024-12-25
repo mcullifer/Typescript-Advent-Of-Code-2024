@@ -1,9 +1,6 @@
 import { Benchmark } from '@/util/benchmark';
 import { Reader } from '@/util/reader';
 
-const test = Reader.read(2, 'test');
-const input = Reader.read(2, 'input');
-
 function setup(input: string[]) {
 	let nums: number[][] = [];
 	for (let line of input) {
@@ -81,5 +78,6 @@ function part2(input: string[]) {
 	return safe;
 }
 
-Benchmark.run(part1, test);
-Benchmark.run(part2, test);
+const test = Reader.read(2, 'test');
+const input = Reader.read(2, 'input');
+Benchmark.withTitle(2).run(part1, test).run(part2, test);

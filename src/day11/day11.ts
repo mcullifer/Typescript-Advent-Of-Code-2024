@@ -1,9 +1,6 @@
 import { Benchmark } from '@/util/benchmark';
 import { Reader } from '@/util/reader';
 
-const test = Reader.read(11, 'test', true);
-const input = Reader.read(11, 'input', true);
-
 function blink(value: string): string[] {
 	if (value === '0') {
 		return ['1'];
@@ -45,5 +42,6 @@ function part2(input: string[]): number {
 	return blinkUntil(stones, 75);
 }
 
-Benchmark.run(part1, test);
-Benchmark.run(part2, test);
+const test = Reader.read(11, 'test', true);
+const input = Reader.read(11, 'input', true);
+Benchmark.withTitle(11).run(part1, test).run(part2, test);
